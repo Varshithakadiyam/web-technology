@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeonArcade — Play. Watch. Compete.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#121824; --soft:#0f1420; --text:#e6f0ff; --muted:#a3b3cc;
+      --accent:#5ee1ff; --accent2:#9d5cff; --win:#00e396; --loss:#ff4560; --glow:0 0 30px rgba(94,225,255,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,rgba(157,92,255,.18),transparent),
+                       radial-gradient(1000px 800px at -10% 30%,rgba(94,225,255,.18),transparent),
+                       var(--bg);
+         color:var(--text);font-family:"Inter",system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    a{color:var(--accent)}
+    .container{max-width:1200px;margin-inline:auto;padding:24px}
+    /* Navbar */
+    .nav{position:sticky;top:0;backdrop-filter:blur(8px);background:linear-gradient( to bottom, rgba(11,15,20,.9), rgba(11,15,20,.6));z-index:20;border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding-block:14px}
+    .brand{display:flex;gap:10px;align-items:center;font-family:"Chakra Petch";font-weight:700;letter-spacing:.5px}
+    .brand-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--glow)}
+    .nav-links{display:flex;gap:16px;flex-wrap:wrap}
+    .nav-links a{color:var(--muted);text-decoration:none;font-weight:600}
+    .nav-links a.active,.nav-links a:hover{color:var(--text)}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;padding-block:36px}
+    .hero h1{font-family:"Chakra Petch";font-size:clamp(32px,5vw,56px);margin:0;line-height:1.05}
+    .hero p{color:var(--muted);font-size:1.05rem}
+    .cta{display:flex;gap:12px;margin-top:18px}
+     .btn{padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:var(--text);text-decoration:none;font-weight:700;letter-spacing:.2px}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;box-shadow:var(--glow)}
+    .tag{display:inline-flex;gap:8px;align-items:center;background:rgba(94,225,255,.1);border:1px solid rgba(94,225,255,.25);padding:6px 10px;border-radius:999px;color:var(--accent);font-weight:700;margin-bottom:10px}
+    .hero-card{position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08)}
+    .hero-card img{width:100%;height:100%;object-fit:cover;display:block;opacity:.9}
+    .hero-badge{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);font-weight:700}
+
+    /* Sections */
+    section{padding-block:36px}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .section-title h2{font-family:"Chakra Petch";margin:0}
+
+    /* Cards grid */
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+    .card img{width:100%;height:160px;object-fit:cover}
+    .card .pad{padding:14px}
+     .pill{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
+    .pill i{width:8px;height:8px;border-radius:50%;display:inline-block}
+    .pill .online{background:var(--win)}
+    .pill .offline{background:var(--loss)}
+    .card .actions{margin-top:auto;display:flex;gap:8px}
+
+    /* Leaderboard */
+    .table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+    .table th,.table td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+    .table tr:last-child td{border-bottom:none}
+    .rank{font-weight:800;color:var(--accent)}
+
+    /* Tabs */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);cursor:pointer;font-weight:700;color:var(--muted)}
+    .tab.active{color:var(--text);border-color:rgba(94,225,255,.5)}
+
+    /* Newsletter */
+    .news{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:center}
+    .news form{display:flex;gap:8px}
+    .input{flex:1;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:var(--soft);color:var(--text)}
+
+    /* Footer */
+    footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero{grid-template-columns:1fr}
+      .news{grid-template-columns:1fr}
+    }
+    @media (min-width:640px){
+      .card{grid-column:span 6}
+    }
+    @media (min-width:980px){
+      .card{grid-column:span 4}
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <div class="nav">
+    <div class="container nav-inner">
+      <div class="brand"><span class="brand-logo"></span> <span>NeonArcade</span></div>
+      <div class="nav-links">
+        <a href="#games" class="active">Games</a>
+        <a href="#news">News</a>
+        <a href="#leaderboard">Leaderboard</a>
+        <a href="#tournaments">Tournaments</a>
+        <a href="#signup">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <span class="tag">⚡ New season live now</span>
+        <h1>Play. Watch. <span style="color:var(--accent)">Compete</span>.</h1>
+        <p>Discover trending titles, catch live events, and climb the ranks. Your gaming hub with news, tournaments, and a thriving community.</p>
+        <div class="cta">
+          <a class="btn primary" href="#tournaments">Join Tournament</a>
+          <a class="btn" href="#games">Browse Games</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <img alt="Hero" src="https://images.unsplash.com/photo-1600861194942-f883de0dfe96?q=80&w=1600&auto=format&fit=crop"/>
+        <div class="hero-badge">🎮 Live event: Champions Cup — 18:30 IST</div>
+      </div>
+    </section>
+
+    <!-- FEATURED GAMES -->
+    <section id="games">
+      <div class="section-title">
+        <h2>Featured Games</h2>
+        <div class="tabs" id="platformTabs">
+          <button class="tab active" data-platform="all">All</button>
+          <button class="tab" data-platform="pc">PC</button>
+          <button class="tab" data-platform="mobile">Mobile</button>
+          <button class="tab" data-platform="console">Console</button>
+        </div>
+      </div>
+      <div class="grid" id="gameGrid">
+        <!-- Cards inserted by JS -->
+          </div>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section id="leaderboard">
+      <div class="section-title"><h2>Top Players</h2></div>
+      <table class="table">
+        <thead>
+          <tr><th>#</th><th>Player</th><th>Game</th><th>Wins</th><th>Win Rate</th></tr>
+        </thead>
+        <tbody id="lbBody">
+          <!-- Rows injected via JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- TOURNAMENTS -->
+    <section id="tournaments">
+      <div class="section-title"><h2>Upcoming Tournaments</h2></div>
+      <div class="grid">
+        <div class="card">
+          <img src="https://tse1.mm.bing.net/th/id/OIP.3VR4dJEImR9pGcqyGOmHbwHaE9?rs=1&pid=ImgDetMain&o=7&rm=3" alt="zombie"/>
+          <div class="pad">
+            <h3>dying light</h3>
+            <div class="pill"><i class="online"></i> Registrations Open</div>
+            <p style="color:var(--muted)">Prize pool: ₹50,000 • Starts: Sep 05 • Region: India</p>
+            <div class="actions">
+              <a class="btn primary" href="#signup">Register</a>
+              <a class="btn" href="#">Rules</a>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop" alt="Esports"/>
+          <div class="pad">
+            <h3>Squad Showdown</h3>
+            <div class="pill"><i class="offline"></i> Starts Soon</div>
+            <p style="color:var(--muted)">Prize pool: ₹1,25,000 • Starts: Sep 12 • Region: SA</p>
+            <div class="actions">
+              <a class="btn" href="#">Notify Me</a>
+              <a class="btn" href="#">Rules</a>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <img src="https://images.unsplash.com/photo-1542751110-97427bbecf20?q=80&w=1200&auto=format&fit=crop" alt="Stage"/>
+          <div class="pad">
+            <h3>Arcade Masters</h3>
+            <div class="pill"><i class="online"></i> Registrations Open</div>
+            <p style="color:var(--muted)">Prize pool: ₹75,000 • Starts: Sep 22 • Region: Global</p>
+            <div class="actions">
+              <a class="btn primary" href="#signup">Register</a>
+              <a class="btn" href="#">Rules</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER / SIGNUP -->
+    <section id="signup" class="news">
+      <div>
+        <h2>Get Patch Notes & Drops</h2>
+        <p style="color:var(--muted)">Subscribe for weekly updates on balance changes, free drops, and exclusive tournament invites.</p>
+        <form id="newsForm" novalidate>
+          <input class="input" id="emailInput" type="email" placeholder="your@email.com" required />
+          <button class="btn primary" type="submit">Subscribe</button>
+        </form>
+        <div id="formMsg" style="margin-top:8px;color:var(--muted)"></div>
+      </div>
+      <div class="hero-card" style="min-height:260px">
+        <img alt="controller" src="https://images.unsplash.com/photo-1605901309584-818e25960a8b?q=80&w=1600&auto=format&fit=crop" />
+        <div class="hero-badge">🎁 Weekly loot drops</div>
+      </div>
+    </section>
+
+    <!-- FOOTER LINKS -->
+    <footer>
+      <div class="container" style="padding-inline:0">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+          <div class="brand"><span class="brand-logo"></span> <span>NeonArcade</span></div>
+          <div style="display:flex;gap:16px;align-items:center">
+            <a href="#">About</a>
+            <a href="#">Support</a>
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+          </div>
+        </div>
+        <div style="margin-top:10px">© <span id="year"></span> NeonArcade. Built for gamers.</div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Dynamic Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Featured Games data
+    const games=[
+      {title:'Valor Legends', platform:'pc', img:'qw.png'},
+      {title:'BGMI Rush', platform:'mobile,pc', img:'BGMI.png'},
+      {title:'Night Racer 2049', platform:'console', img:'https://i.ytimg.com/vi/9emQDcfWddg/maxresdefault.jpg'},
+      {title:'Cod black ops', platform:'pc', img:'data:image/webp;base64,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'},
+      {title:'Crysis-3', platform:'pc', img:'https://th.bing.com/th/id/OIP.Qfuq2pdqW0S7wemqIph-lQHaEK?w=281&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3'},
+      {title:'nfs-payback', platform:'console', img:'https://i.gadgets360cdn.com/large/nfs-payback-pc_1509702597620.jpg'}
+    ];
+
+    const grid=document.getElementById('gameGrid');
+    function renderGrid(platform='all'){
+      grid.innerHTML='';
+      games.filter(g=>platform==='all'||g.platform===platform).forEach(g=>{
+        const el=document.createElement('div');
+        el.className='card';
+        el.innerHTML=`<img alt="${g.title}" src="${g.img}"><div class="pad"><h3>${g.title}</h3>
+          <div class="pill"><i class="online"></i> ${g.platform.toUpperCase()}</div>
+          <p style="color:var(--muted)">Jump into ${g.title} and climb the global ladder.</p>
+          <div class="actions"><a class="btn primary" href="#">Play</a><a class="btn" href="#">Details</a></div></div>`;
+        grid.appendChild(el);
+      })
+    }
+    renderGrid();
+
+    // Tabs behavior
+    document.getElementById('platformTabs').addEventListener('click', (e)=>{
+      if(!e.target.classList.contains('tab')) return;
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      e.target.classList.add('active');
+      renderGrid(e.target.dataset.platform);
+    });
+
+    // Leaderboard mock
+    const rows=[
+      {p:'#Crysis', game:'BGMI', wins:74, rate:68},
+      {p:'MaxRowdy', game:'Valor Legends', wins:61, rate:62},
+      {p:'RookieIsLive', game:'Night Racer', wins:54, rate:57},
+      {p:'Luufy', game:'Shadow Ops', wins:49, rate:55},
+    ];
+    const lb=document.getElementById('lbBody');
+    rows.forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td class="rank">${i+1}</td><td>${r.p}</td><td>${r.game}</td><td>${r.wins}</td><td>${r.rate}%</td>`;
+      lb.appendChild(tr);
+    });
+
+    // Newsletter mini-validation
+    const form=document.getElementById('newsForm');
+    const email=document.getElementById('emailInput');
+    const msg=document.getElementById('formMsg');
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const ok=/^\S+@\S+\.\S+$/.test(email.value.trim());
+      if(!ok){msg.style.color='var(--loss)';msg.textContent='Please enter a valid email.';return}
+      msg.style.color='var(--win)';
+      msg.textContent='Subscribed! Check your inbox for a confirmation.';
+      form.reset();
+    });
+  </script>
+</body>
+</html>
